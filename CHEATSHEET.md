@@ -252,11 +252,11 @@ atuin search <q>          # query shell history from CLI
 ## 10. Maintenance
 
 ```bash
-cd ~/dotfile && git pull          # get updates
+cd ~/flightdeck && git pull       # get updates
 ./install.sh                      # re-apply (idempotent)
 stow -t ~ <package>               # link one package
 stow -D -t ~ <package>            # unlink one package
-brew bundle --file=~/dotfile/Brewfile   # sync packages
+brew bundle --file=~/flightdeck/Brewfile   # sync packages
 
 # Neovim
 :Lazy        # plugin manager (U = update, S = sync, x = clean)

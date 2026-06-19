@@ -1,4 +1,4 @@
-# ~/.config/fish/config.fish — managed by dotfile (github.com/vndee/dotfile)
+# ~/.config/fish/config.fish — managed by flightdeck (github.com/vndee/flightdeck)
 
 # --- Homebrew (must be early so PATH is correct in all sessions) ---
 if test -x /opt/homebrew/bin/brew

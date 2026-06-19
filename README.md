@@ -1,8 +1,8 @@
-# dotfiles
+# flightdeck ✈️
 
-> An **agentic-native** terminal engineering environment for macOS. No IDE.
-> Ghostty · fish · tmux · Neovim (LazyVim) · Claude Code — themed in Catppuccin
-> Mocha and managed with GNU Stow.
+> Your **agentic cockpit** in the terminal — an IDE-free macOS dev environment
+> where AI agents are first-class. Ghostty · fish · tmux · Neovim (LazyVim) ·
+> Claude Code, themed Catppuccin Mocha and managed with GNU Stow.
 
 Built for a workflow where AI agents are first-class: run several Claude Code
 agents in parallel on isolated git worktrees, or drive one from inside Neovim.
@@ -22,8 +22,8 @@ agents in parallel on isolated git worktrees, or drive one from inside Neovim.
 ## Install
 
 ```bash
-git clone https://github.com/vndee/dotfile ~/dotfile
-cd ~/dotfile
+git clone https://github.com/vndee/flightdeck ~/flightdeck
+cd ~/flightdeck
 ./install.sh          # installs Homebrew packages, stows configs, sets up plugins
 chsh -s "$(command -v fish)"   # make fish your login shell
 ```
