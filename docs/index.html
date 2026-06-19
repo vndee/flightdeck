@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<script>document.documentElement.classList.add('js')</script>
+<title>flightdeck — your agentic cockpit in the terminal</title>
+<meta name="description" content="An IDE-free macOS dev environment where AI agents are first-class. Ghostty · fish · tmux · Neovim (LazyVim) · Claude Code, themed Catppuccin Mocha, managed with GNU Stow." />
+<meta name="theme-color" content="#1e1e2e" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%88%EF%B8%8F%3C/text%3E%3C/svg%3E" />
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="flightdeck — your agentic cockpit in the terminal" />
+<meta property="og:description" content="IDE-free macOS dev environment where AI agents are first-class. Ghostty · fish · tmux · Neovim · Claude Code · Catppuccin Mocha." />
+<meta property="og:image" content="assets/cockpit.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@500;700;800&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    /* Catppuccin Mocha */
+    --crust:#11111b; --mantle:#181825; --base:#1e1e2e;
+    --s0:#313244; --s1:#45475a; --s2:#585b70;
+    --ov0:#6c7086; --ov1:#7f849c; --ov2:#9399b2;
+    --sub0:#a6adc8; --sub1:#bac2de; --text:#cdd6f4;
+    --mauve:#cba6f7; --blue:#89b4fa; --sapphire:#74c7ec; --sky:#89dceb;
+    --green:#a6e3a1; --teal:#94e2d5; --peach:#fab387; --yellow:#f9e2af;
+    --red:#f38ba8; --pink:#f5c2e7; --lav:#b4befe;
+    --maxw:1120px;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --display:"Martian Mono","JetBrains Mono",monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--base); color:var(--text);
+    font-family:var(--mono); font-size:15px; line-height:1.65;
+    -webkit-font-smoothing:antialiased; overflow-x:hidden; position:relative;
+  }
+  /* ---- atmosphere: glows + grid + grain ---- */
+  .bg{position:fixed; inset:0; z-index:-2; overflow:hidden; pointer-events:none}
+  .bg::before{ /* fine HUD grid */
+    content:""; position:absolute; inset:-2px;
+    background-image:
+      linear-gradient(transparent 0 31px, rgba(205,214,244,.022) 31px 32px),
+      linear-gradient(90deg, transparent 0 31px, rgba(205,214,244,.022) 31px 32px);
+    background-size:32px 32px;
+    mask-image:radial-gradient(ellipse 90% 70% at 50% 0%, #000 35%, transparent 80%);
+  }
+  .glow{position:absolute; border-radius:50%; filter:blur(90px); opacity:.5}
+  .g1{width:560px;height:560px;background:radial-gradient(circle,#cba6f7,transparent 65%);top:-220px;left:-120px}
+  .g2{width:620px;height:620px;background:radial-gradient(circle,#89b4fa,transparent 65%);top:-160px;right:-180px;opacity:.4}
+  .g3{width:480px;height:480px;background:radial-gradient(circle,#a6e3a1,transparent 70%);top:840px;left:40%;opacity:.16}
+  .grain{position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.04; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+  a{color:var(--blue); text-decoration:none}
+  ::selection{background:var(--mauve); color:var(--crust)}
+
+  /* ---- top status bar (tmux-ish) ---- */
+  .statusbar{position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; gap:14px;
+    padding:9px 18px; font-size:12.5px; letter-spacing:.02em;
+    background:rgba(17,17,27,.72); backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--s0);}
+  .statusbar .brand{display:flex; align-items:center; gap:8px; font-weight:700; color:var(--text)}
+  .statusbar .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+  .statusbar .seg{color:var(--ov2)}
+  .statusbar .spacer{flex:1}
+  .statusbar nav{display:flex; gap:6px; align-items:center}
+  .statusbar nav a{color:var(--sub0); padding:4px 9px; border-radius:6px; transition:.18s}
+  .statusbar nav a:hover{background:var(--s0); color:var(--text)}
+  .statusbar .pill{color:var(--crust); background:var(--mauve); font-weight:700; padding:3px 10px; border-radius:999px}
+
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 22px}
+
+  /* ---- hero ---- */
+  .hero{padding:96px 0 40px; position:relative}
+  .eyebrow{display:inline-flex; align-items:center; gap:9px; font-size:12px; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--peach); border:1px solid var(--s0); background:rgba(49,50,68,.35);
+    padding:6px 14px; border-radius:999px;}
+  .eyebrow b{color:var(--text); font-weight:700}
+  h1{font-family:var(--display); font-weight:800; line-height:.92; letter-spacing:-.02em;
+    font-size:clamp(52px,11vw,128px); margin:22px 0 0; }
+  h1 .word{background:linear-gradient(100deg,var(--mauve),var(--lav) 38%,var(--sapphire) 78%,var(--teal));
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    filter:drop-shadow(0 6px 40px rgba(203,166,247,.28));}
+  h1 .plane{font-family:var(--mono); -webkit-text-fill-color:initial; color:var(--text); font-size:.42em; vertical-align:.42em; margin-left:.1em}
+  .cursor{display:inline-block; width:.5ch; height:.84em; background:var(--mauve); margin-left:.08em;
+    transform:translateY(.08em); animation:blink 1.05s steps(1) infinite; box-shadow:0 0 14px var(--mauve)}
+  @keyframes blink{50%{opacity:0}}
+  .tagline{font-size:clamp(18px,2.4vw,25px); color:var(--sub1); margin:26px 0 6px; max-width:640px; font-weight:500}
+  .subline{color:var(--ov2); max-width:620px; font-size:15px}
+  .subline b{color:var(--sub0); font-weight:500}
+
+  /* terminal install block */
+  .term{margin-top:38px; max-width:720px; border:1px solid var(--s0); border-radius:12px; overflow:hidden;
+    background:linear-gradient(180deg,var(--mantle),var(--crust)); box-shadow:0 30px 80px -30px rgba(0,0,0,.7), 0 0 0 1px rgba(203,166,247,.05);}
+  .term .bar{display:flex; align-items:center; gap:8px; padding:11px 14px; background:rgba(49,50,68,.45); border-bottom:1px solid var(--s0)}
+  .tl{width:12px;height:12px;border-radius:50%}
+  .tl.r{background:#f38ba8}.tl.y{background:#f9e2af}.tl.g{background:#a6e3a1}
+  .term .bar .name{margin-left:8px; font-size:12px; color:var(--ov2)}
+  .term .body{padding:20px 18px; font-size:14px; display:flex; align-items:flex-start; gap:14px; justify-content:space-between}
+  .cmd{white-space:pre-wrap; word-break:break-word; line-height:1.9}
+  .cmd .p{color:var(--green)} .cmd .c{color:var(--text)} .cmd .f{color:var(--ov1)} .cmd .a{color:var(--peach)}
+  .copy{flex:none; border:1px solid var(--s1); background:var(--s0); color:var(--sub1); cursor:pointer;
+    font-family:var(--mono); font-size:12px; padding:7px 12px; border-radius:7px; transition:.18s}
+  .copy:hover{background:var(--s1); color:var(--text); border-color:var(--mauve)}
+  .copy.done{color:var(--green); border-color:var(--green)}
+
+  .cta{display:flex; flex-wrap:wrap; gap:14px; margin-top:30px; align-items:center}
+  .btn{display:inline-flex; align-items:center; gap:9px; font-weight:700; font-size:14px; padding:13px 22px; border-radius:10px; transition:.2s}
+  .btn.primary{background:var(--mauve); color:var(--crust); box-shadow:0 12px 30px -10px rgba(203,166,247,.55)}
+  .btn.primary:hover{transform:translateY(-2px); box-shadow:0 18px 40px -12px rgba(203,166,247,.7)}
+  .btn.ghost{border:1px solid var(--s1); color:var(--sub1)}
+  .btn.ghost:hover{border-color:var(--mauve); color:var(--text); background:rgba(49,50,68,.4)}
+
+  /* section scaffolding */
+  section.block{padding:64px 0; position:relative}
+  .label{display:flex; align-items:center; gap:12px; font-size:12.5px; letter-spacing:.24em; text-transform:uppercase; color:var(--ov2); margin-bottom:30px}
+  .label::before{content:"◇"; color:var(--mauve)}
+  .label .line{flex:1; height:1px; background:linear-gradient(90deg,var(--s0),transparent)}
+  h2{font-family:var(--display); font-weight:700; font-size:clamp(26px,4vw,40px); letter-spacing:-.01em; line-height:1.1}
+  h2 + .lede{color:var(--ov2); margin-top:12px; max-width:620px}
+
+  /* screenshot grid */
+  .shots{display:grid; grid-template-columns:1fr 1fr; gap:26px; margin-top:8px}
+  .shot{border:1px solid var(--s0); border-radius:12px; overflow:hidden; background:var(--mantle);
+    box-shadow:0 24px 60px -34px rgba(0,0,0,.8); transition:.3s}
+  .shot:hover{transform:translateY(-4px); border-color:var(--s1); box-shadow:0 34px 80px -34px rgba(0,0,0,.9)}
+  .shot .bar{display:flex; align-items:center; gap:7px; padding:9px 13px; background:rgba(49,50,68,.4); border-bottom:1px solid var(--s0)}
+  .shot .bar .name{margin-left:6px; font-size:11.5px; color:var(--ov1)}
+  .shot img{display:block; width:100%; height:auto}
+  .shot .cap{padding:14px 16px; border-top:1px solid var(--s0); font-size:13px; color:var(--sub0)}
+  .shot .cap b{color:var(--text); font-weight:700}
+  .shot .cap kbd{color:var(--peach)}
+
+  /* stack grid */
+  .grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px}
+  .card{border:1px solid var(--s0); border-radius:12px; padding:20px; background:linear-gradient(180deg,rgba(49,50,68,.22),transparent); transition:.25s; position:relative; overflow:hidden}
+  .card::after{content:""; position:absolute; inset:0; border-radius:12px; padding:1px; background:linear-gradient(130deg,transparent,var(--accent,#cba6f7),transparent); -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; opacity:0; transition:.3s}
+  .card:hover{transform:translateY(-3px); border-color:transparent}
+  .card:hover::after{opacity:.7}
+  .card .role{font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent,var(--mauve)); margin-bottom:8px}
+  .card .tool{font-weight:700; color:var(--text); font-size:16px; margin-bottom:6px}
+  .card p{color:var(--ov2); font-size:13px; line-height:1.6}
+
+  /* cheatsheet */
+  .cheat{display:grid; grid-template-columns:repeat(2,1fr); gap:10px 34px; margin-top:6px}
+  .row{display:flex; align-items:center; gap:14px; padding:11px 4px; border-bottom:1px dashed var(--s0)}
+  kbd{font-family:var(--mono); font-size:12.5px; background:var(--s0); border:1px solid var(--s1); border-bottom-width:2px;
+    color:var(--lav); padding:3px 8px; border-radius:6px; white-space:nowrap; flex:none}
+  .row .desc{color:var(--sub0); font-size:13.5px}
+  .row .desc b{color:var(--text); font-weight:500}
+
+  /* workflow */
+  .flow{display:grid; grid-template-columns:1.1fr 1fr; gap:30px; align-items:center}
+  .flow .codeblk{border:1px solid var(--s0); border-radius:12px; background:var(--crust); overflow:hidden}
+  .flow .codeblk .bar{display:flex; gap:7px; padding:10px 13px; background:rgba(49,50,68,.4); border-bottom:1px solid var(--s0)}
+  .flow pre{padding:18px; font-size:13px; line-height:1.95; overflow-x:auto}
+  pre .p{color:var(--green)} pre .cmt{color:var(--ov0)} pre .k{color:var(--mauve)} pre .s{color:var(--green)} pre .arg{color:var(--peach)}
+  .flow ul{list-style:none; display:flex; flex-direction:column; gap:16px}
+  .flow li{display:flex; gap:13px; color:var(--sub0); font-size:14.5px}
+  .flow li .ic{flex:none; width:30px;height:30px; display:grid; place-items:center; border-radius:8px; background:var(--s0); color:var(--mauve); font-size:14px}
+  .flow li b{color:var(--text); font-weight:700}
+
+  /* footer status bar */
+  footer{margin-top:40px; border-top:1px solid var(--s0); background:rgba(17,17,27,.6)}
+  .fbar{max-width:var(--maxw); margin:0 auto; padding:14px 22px; display:flex; flex-wrap:wrap; align-items:center; gap:10px 18px; font-size:12.5px; color:var(--ov2)}
+  .fbar .tag{display:inline-flex; align-items:center; gap:7px}
+  .fbar .tag.ok{color:var(--green)} .fbar .tag.mauve{color:var(--mauve)} .fbar .tag.blue{color:var(--blue)}
+  .fbar .spacer{flex:1}
+  .fbar a{color:var(--sub0)} .fbar a:hover{color:var(--text)}
+
+  /* reveal */
+  .js .reveal{opacity:0; transform:translateY(26px); transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1; transform:none}
+  .hero .eyebrow{animation:rise .7s .05s both} .hero h1{animation:rise .8s .12s both}
+  .hero .tagline{animation:rise .8s .22s both} .hero .subline{animation:rise .8s .3s both}
+  .hero .term{animation:rise .8s .4s both} .hero .cta{animation:rise .8s .5s both}
+  @keyframes rise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+
+  @media(max-width:760px){
+    .shots,.grid,.cheat,.flow{grid-template-columns:1fr}
+    .term .body{flex-direction:column}
+    .statusbar .hideSm{display:none}
+    .hero{padding:64px 0 24px}
+  }
+</style>
+</head>
+<body>
+<div class="bg"><div class="glow g1"></div><div class="glow g2"></div><div class="glow g3"></div></div>
+<div class="grain"></div>
+
+<div class="statusbar">
+  <span class="brand"><span class="dot"></span>✈ flightdeck</span>
+  <span class="seg hideSm">main</span>
+  <span class="seg hideSm">~/flightdeck</span>
+  <span class="spacer"></span>
+  <nav>
+    <a href="https://github.com/vndee/flightdeck#readme">README</a>
+    <a href="https://github.com/vndee/flightdeck/blob/main/LICENSE">MIT</a>
+    <a href="https://github.com/vndee/flightdeck">GitHub ↗</a>
+  </nav>
+  <span class="pill">Catppuccin Mocha</span>
+</div>
+
+<main class="wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <span class="eyebrow">macOS · IDE-free · <b>agent-native</b></span>
+    <h1><span class="word">flightdeck</span><span class="plane">✈︎</span><span class="cursor"></span></h1>
+    <p class="tagline">Your agentic cockpit in the terminal.</p>
+    <p class="subline"><b>Ghostty · fish · tmux · Neovim (LazyVim) · Claude Code</b> — a dotfiles setup where AI agents are first-class: run several Claude Code agents in parallel on isolated git worktrees, or drive one from inside Neovim. Themed Catppuccin Mocha, managed with GNU Stow.</p>
+
+    <div class="term">
+      <div class="bar"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="name">fish — bootstrap</span></div>
+      <div class="body">
+        <code class="cmd" id="cmd"><span class="p">❯</span> <span class="c">git clone https://github.com/vndee/flightdeck ~/flightdeck</span>
+<span class="p">❯</span> <span class="c">cd ~/flightdeck && </span><span class="a">./install.sh</span>  <span class="f"># brew + stow + plugins</span></code>
+        <button class="copy" id="copy">copy</button>
+      </div>
+    </div>
+
+    <div class="cta">
+      <a class="btn primary" href="https://github.com/vndee/flightdeck">★ Star on GitHub</a>
+      <a class="btn ghost" href="#shots">See it in action ↓</a>
+    </div>
+  </section>
+
+  <!-- SCREENSHOTS -->
+  <section class="block reveal" id="shots">
+    <div class="label">the cockpit <span class="line"></span></div>
+    <div class="shots">
+      <figure class="shot">
+        <div class="bar"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="name">nvim — claudecode.nvim</span></div>
+        <img src="assets/cockpit.png" alt="Neovim with Claude Code in a split" loading="lazy" />
+        <figcaption class="cap"><b>Neovim + Claude Code</b> — editor, file tree and the agent in one frame.</figcaption>
+      </figure>
+      <figure class="shot">
+        <div class="bar"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="name">lazygit</span></div>
+        <img src="assets/lazygit.png" alt="lazygit with delta diffs" loading="lazy" />
+        <figcaption class="cap"><b>lazygit</b> — full git TUI with delta diffs · <kbd>prefix g</kbd></figcaption>
+      </figure>
+      <figure class="shot">
+        <div class="bar"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="name">yazi</span></div>
+        <img src="assets/yazi.png" alt="yazi file manager with bat previews" loading="lazy" />
+        <figcaption class="cap"><b>yazi</b> — file manager with bat previews · <kbd>y</kbd></figcaption>
+      </figure>
+      <figure class="shot">
+        <div class="bar"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="name">btop</span></div>
+        <img src="assets/btop.png" alt="btop system monitor" loading="lazy" />
+        <figcaption class="cap"><b>btop</b> — animated system monitor · <kbd>top</kbd></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- STACK -->
+  <section class="block reveal">
+    <div class="label">the stack <span class="line"></span></div>
+    <h2>Modern tools, wired together.</h2>
+    <p class="lede">Every layer is a fast, maintained CLI replacement — themed identically and stowed into place.</p>
+    <div class="grid" style="margin-top:30px">
+      <div class="card" style="--accent:#cba6f7"><div class="role">Terminal</div><div class="tool">Ghostty</div><p>GPU-accelerated, native macOS, true-color — steady block cursor.</p></div>
+      <div class="card" style="--accent:#89b4fa"><div class="role">Shell</div><div class="tool">fish + Starship</div><p>Inline abbreviations, a fast prompt, zoxide + atuin + fzf wired in.</p></div>
+      <div class="card" style="--accent:#a6e3a1"><div class="role">Multiplexer</div><div class="tool">tmux + sesh</div><p>The cockpit: sessions, panes, popups, fuzzy session switching.</p></div>
+      <div class="card" style="--accent:#fab387"><div class="role">Editor</div><div class="tool">Neovim · LazyVim</div><p>Neo-tree, fzf-lua, treesitter — seamless tmux-pane navigation.</p></div>
+      <div class="card" style="--accent:#f5c2e7"><div class="role">Agent</div><div class="tool">Claude Code · wt</div><p>Parallel agents on isolated worktrees, plus claudecode.nvim in-editor.</p></div>
+      <div class="card" style="--accent:#94e2d5"><div class="role">CLI core</div><div class="tool">bat · eza · delta · yazi</div><p>fd, ripgrep, lazygit, btop, gh — sharper defaults for everything.</p></div>
+    </div>
+  </section>
+
+  <!-- WORKFLOW -->
+  <section class="block reveal">
+    <div class="label">the agentic workflow <span class="line"></span></div>
+    <div class="flow">
+      <div class="codeblk">
+        <div class="bar"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span></div>
+<pre><span class="cmt"># one isolated agent per task — zero collisions</span>
+<span class="p">❯</span> <span class="k">wt</span> <span class="arg">my-feature</span>     <span class="cmt"># worktree + tmux (nvim + claude)</span>
+<span class="p">❯</span> <span class="k">wt</span> <span class="arg">another-fix</span>   <span class="cmt"># a second agent, in parallel</span>
+<span class="p">❯</span> <span class="k">wt</span> ls             <span class="cmt"># list worktrees & sessions</span>
+
+<span class="cmt"># jump between them</span>
+<span class="p">❯</span> prefix <span class="arg">T</span>          <span class="cmt"># fuzzy session switcher (sesh)</span></pre>
+      </div>
+      <ul>
+        <li><span class="ic">⌥</span><span><b>Parallel by design.</b> Each task gets its own checkout and tmux session, so 2–4 Claude Code agents run concurrently on separate branches.</span></li>
+        <li><span class="ic">⌘</span><span><b>Agent in the editor.</b> <kbd>&lt;leader&gt;ac</kbd> toggles Claude Code bound to Neovim — review and apply diffs natively.</span></li>
+        <li><span class="ic">⇄</span><span><b>One grid.</b> <kbd>Ctrl-h/j/k/l</kbd> flows seamlessly between Neovim splits and tmux panes.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- CHEATSHEET -->
+  <section class="block reveal">
+    <div class="label">muscle memory <span class="line"></span></div>
+    <h2>Quick tips.</h2>
+    <p class="lede">A handful of keys cover most of the day.</p>
+    <div class="cheat" style="margin-top:24px">
+      <div class="row"><kbd>Ctrl-h/j/k/l</kbd><span class="desc">move across <b>Neovim splits + tmux panes</b> (no prefix)</span></div>
+      <div class="row"><kbd>prefix T</kbd><span class="desc">fuzzy <b>session switcher</b> — sessions + zoxide dirs</span></div>
+      <div class="row"><kbd>&lt;leader&gt;e</kbd><span class="desc">toggle the <b>Neo-tree</b> file explorer (<kbd>H</kbd> = dotfiles)</span></div>
+      <div class="row"><kbd>&lt;leader&gt;&lt;leader&gt;</kbd><span class="desc">fuzzy <b>find files</b>; <kbd>&lt;leader&gt;/</kbd> greps contents</span></div>
+      <div class="row"><kbd>z &lt;dir&gt;</kbd><span class="desc"><b>zoxide</b> jump to a frecent directory</span></div>
+      <div class="row"><kbd>Ctrl-r</kbd><span class="desc"><b>atuin</b> fuzzy shell-history search</span></div>
+      <div class="row"><kbd>ls · ll · lt</kbd><span class="desc"><b>eza</b> — icons, git status, tree view</span></div>
+      <div class="row"><kbd>y</kbd><span class="desc">open <b>yazi</b> at the shell; <kbd>cat</kbd> → bat, <kbd>top</kbd> → btop</span></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="fbar">
+    <span class="tag ok">● main</span>
+    <span class="tag">✓ clean</span>
+    <span class="tag mauve">✈ flightdeck</span>
+    <span class="tag blue">Catppuccin Mocha</span>
+    <span class="spacer"></span>
+    <a href="https://github.com/vndee/flightdeck">github.com/vndee/flightdeck</a>
+    <span>· MIT</span>
+  </div>
+</footer>
+
+<script>
+  // copy install command
+  const btn=document.getElementById('copy');
+  btn.addEventListener('click',async()=>{
+    const txt='git clone https://github.com/vndee/flightdeck ~/flightdeck\ncd ~/flightdeck && ./install.sh';
+    try{await navigator.clipboard.writeText(txt); btn.textContent='copied ✓'; btn.classList.add('done');
+      setTimeout(()=>{btn.textContent='copy'; btn.classList.remove('done')},1600);}catch(e){btn.textContent='⌘C';}
+  });
+  // reveal on scroll
+  const io=new IntersectionObserver((es)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
