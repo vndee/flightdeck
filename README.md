@@ -125,21 +125,6 @@ Machine-local secrets live in `~/.config/fish/conf.d/secret.fish` and git
 identity in `~/.gitconfig` — both are gitignored / outside the repo. Copy the
 provided `*.example` files on a fresh machine.
 
-## Removing GUI IDEs (when you're ready)
-
-This setup intentionally keeps your GUI editors during the transition. Once the
-terminal flow is proven, remove them — **but keep the Xcode Command Line Tools**,
-which Homebrew and compilers depend on:
-
-```bash
-brew uninstall --cask cursor visual-studio-code   # if installed via brew
-# or drag Cursor.app / Visual Studio Code.app to Trash
-rm -rf ~/Library/Application\ Support/Cursor ~/Library/Application\ Support/Code  # optional caches
-
-# Keep the CLT (do NOT remove): xcode-select -p  → /Library/Developer/CommandLineTools
-# Only remove the full Xcode.app if you don't build Apple platform apps.
-```
-
 ## License
 
 MIT — see [LICENSE](LICENSE).
