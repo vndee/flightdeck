@@ -1,0 +1,8 @@
+# Copy to ~/.gitconfig (or ~/.config/git/local.config) on a fresh machine.
+# Keep real identity/keys OUT of the public dotfiles repo.
+# [user]
+#     name = Your Name
+#     email = you@example.com
+#     signingkey = <gpg-key-id>
+# [credential]
+#     helper = osxkeychain

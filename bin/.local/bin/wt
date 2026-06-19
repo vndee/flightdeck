@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+# wt — git worktree + tmux + agent orchestrator
+#
+# The core of the agentic-parallel workflow: spin up an isolated git worktree
+# for a task, give it its own tmux session with an editor window and a Claude
+# Code window, then drop you into it. Run several at once; agents never collide.
+#
+#   wt <branch>        create/attach a worktree session for <branch>
+#   wt ls              list worktrees and their sessions
+#   wt rm <branch>     remove the worktree (and its session)
+#   wt cd <branch>     print the worktree path (use: cd "$(wt cd x)")
+#   wt help            this help
+#
+set -euo pipefail
+
+usage() {
+  sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//'
+}
+
+die() { echo "wt: $*" >&2; exit 1; }
+
+git_root() { git rev-parse --show-toplevel 2>/dev/null || die "not inside a git repo"; }
+
+slug() { echo "$1" | tr '/ ' '--' | tr -cd '[:alnum:]-_'; }
+
+cmd_create() {
+  local branch="$1"
+  [ -n "$branch" ] || die "usage: wt <branch>"
+  local root repo wtdir session
+  root="$(git_root)"
+  repo="$(basename "$root")"
+  wtdir="${root}/../${repo}.worktrees/$(slug "$branch")"
+  session="${repo}-$(slug "$branch")"
+
+  if [ ! -d "$wtdir" ]; then
+    if git show-ref --verify --quiet "refs/heads/$branch"; then
+      git -C "$root" worktree add "$wtdir" "$branch"
+    else
+      git -C "$root" worktree add "$wtdir" -b "$branch"
+    fi
+    echo "wt: created worktree $wtdir"
+  fi
+
+  # Build the tmux session if it doesn't exist
+  if ! tmux has-session -t "=$session" 2>/dev/null; then
+    tmux new-session -d -s "$session" -c "$wtdir" -n editor
+    tmux send-keys -t "$session:editor" "nvim" C-m
+    tmux new-window -t "$session" -c "$wtdir" -n claude
+    tmux send-keys -t "$session:claude" "claude" C-m
+    tmux select-window -t "$session:editor"
+  fi
+
+  if [ -n "${TMUX:-}" ]; then
+    tmux switch-client -t "$session"
+  else
+    tmux attach-session -t "$session"
+  fi
+}
+
+cmd_ls() {
+  echo "── worktrees ──"
+  git worktree list 2>/dev/null || die "not inside a git repo"
+  echo
+  echo "── tmux sessions ──"
+  tmux ls 2>/dev/null || echo "(no tmux server running)"
+}
+
+cmd_rm() {
+  local branch="$1"
+  [ -n "$branch" ] || die "usage: wt rm <branch>"
+  local root repo wtdir session
+  root="$(git_root)"
+  repo="$(basename "$root")"
+  wtdir="${root}/../${repo}.worktrees/$(slug "$branch")"
+  session="${repo}-$(slug "$branch")"
+  tmux kill-session -t "=$session" 2>/dev/null || true
+  git -C "$root" worktree remove "$wtdir" --force 2>/dev/null \
+    && echo "wt: removed $wtdir" \
+    || die "could not remove $wtdir (commit or stash changes first)"
+}
+
+cmd_cd() {
+  local branch="$1"
+  [ -n "$branch" ] || die "usage: wt cd <branch>"
+  local root repo
+  root="$(git_root)"; repo="$(basename "$root")"
+  echo "${root}/../${repo}.worktrees/$(slug "$branch")"
+}
+
+main() {
+  local sub="${1:-help}"
+  case "$sub" in
+    ls|list)        cmd_ls ;;
+    rm|remove)      shift; cmd_rm "${1:-}" ;;
+    cd|path)        shift; cmd_cd "${1:-}" ;;
+    help|-h|--help) usage ;;
+    *)              cmd_create "$sub" ;;
+  esac
+}
+
+main "$@"

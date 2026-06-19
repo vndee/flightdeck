@@ -1,0 +1,19 @@
+# Global gitignore (core.excludesFile via XDG default ~/.config/git/ignore)
+.DS_Store
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.log
+.env
+.env.local
+node_modules/
+__pycache__/
+.venv/
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+dist/
+build/
+.claude/settings.local.json

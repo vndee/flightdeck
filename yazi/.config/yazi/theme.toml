@@ -1,0 +1,5 @@
+# Theme is provided by the catppuccin-mocha flavor (installed by install.sh via
+# `ya pkg add yazi-rs/flavors:catppuccin-mocha`). Falls back to default if absent.
+[flavor]
+dark = "catppuccin-mocha"
+light = "catppuccin-latte"

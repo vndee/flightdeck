@@ -1,0 +1,57 @@
+# Shared git config (stowed). Personal identity stays in ~/.gitconfig
+# (machine-local, not in this repo). See git/.config/git/local.config.example.
+
+[init]
+	defaultBranch = main
+[core]
+	editor = nvim
+	pager = delta
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	navigate = true
+	line-numbers = true
+	side-by-side = false
+	hyperlinks = true
+	syntax-theme = Catppuccin Mocha
+[delta "interactive"]
+	keep-plus-minus-markers = false
+[merge]
+	conflictstyle = zdiff3
+[diff]
+	colorMoved = default
+	algorithm = histogram
+[push]
+	autoSetupRemote = true
+	default = current
+[pull]
+	rebase = true
+[fetch]
+	prune = true
+	pruneTags = true
+[rebase]
+	autoStash = true
+	updateRefs = true
+[branch]
+	sort = -committerdate
+[column]
+	ui = auto
+[rerere]
+	enabled = true
+
+[alias]
+	s = status -sb
+	co = checkout
+	br = branch
+	cm = commit -m
+	aa = add -A
+	lg = log --oneline --graph --decorate --all -30
+	last = log -1 HEAD --stat
+	unstage = restore --staged
+	amend = commit --amend --no-edit
+	wt = worktree
+	wtl = worktree list
+	sync = !git pull --rebase && git push
+
+# Personal identity / signing / credentials (machine-local, not committed).
+# git reads ~/.gitconfig in addition to this file.
