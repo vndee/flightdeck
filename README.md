@@ -7,6 +7,8 @@
 Built for a workflow where AI agents are first-class: run several Claude Code
 agents in parallel on isolated git worktrees, or drive one from inside Neovim.
 
+![Neovim with Claude Code in a split, inside a tmux session — the flightdeck cockpit](assets/cockpit.png)
+
 ## Stack
 
 | Layer | Tool |
@@ -119,6 +121,12 @@ New here? These cover most day-to-day moves.
 - `prefix a` spawns a Claude pane; `wt <branch>` spins up a full parallel agent on its own worktree.
 
 **Discover anything:** press `<leader>` (Space) and pause — which-key pops up with every shortcut.
+
+## Gallery
+
+| lazygit — `prefix g` | yazi — `y` | btop — `top` |
+|:---:|:---:|:---:|
+| [![lazygit with delta diffs](assets/lazygit.png)](assets/lazygit.png) | [![yazi file manager with bat previews](assets/yazi.png)](assets/yazi.png) | [![btop system monitor](assets/btop.png)](assets/btop.png) |
 
 ## Secrets
 
