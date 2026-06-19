@@ -50,6 +50,12 @@ cmd_create() {
     tmux select-window -t "$session:editor"
   fi
 
+  # Tag the session with its worktree root so `prefix + c` / splits open new
+  # windows *here*, even from a pane whose cwd has wandered (e.g. an agent that
+  # chdir'd away). The tmux bindings read @wt_root, falling back to the pane cwd.
+  # Set unconditionally so re-running wt backfills sessions made before this.
+  tmux set-option -t "$session" @wt_root "$wtdir"
+
   if [ -n "${TMUX:-}" ]; then
     tmux switch-client -t "$session"
   else
