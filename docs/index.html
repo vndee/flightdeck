@@ -165,6 +165,30 @@
   .flow li .ic{flex:none; width:30px;height:30px; display:grid; place-items:center; border-radius:8px; background:var(--s0); color:var(--mauve); font-size:14px}
   .flow li b{color:var(--text); font-weight:700}
 
+  /* two-level parallelism */
+  .muted{color:var(--ov1)}
+  .levels{display:grid; grid-template-columns:1.05fr .95fr; gap:36px; align-items:center; margin-top:30px}
+  .leveldiagram{border:1px solid var(--s0); border-radius:14px; padding:16px 16px 14px; background:linear-gradient(180deg,var(--mantle),var(--crust)); box-shadow:0 30px 70px -34px rgba(0,0,0,.8)}
+  .gtabbar{display:flex; gap:6px; align-items:flex-end; padding-bottom:0}
+  .gtab{font-size:12px; color:var(--ov2); padding:8px 14px; border-radius:9px 9px 0 0; background:rgba(49,50,68,.28); border:1px solid transparent; white-space:nowrap}
+  .gtab.on{color:var(--text); background:var(--base); border-color:var(--s0); box-shadow:inset 0 2px 0 var(--mauve)}
+  .gtab.new{color:var(--ov0); background:transparent; padding:8px 11px}
+  .tmuxwin{border:1px solid var(--s0); border-radius:0 10px 10px 10px; overflow:hidden; background:var(--base)}
+  .tmuxbar{display:flex; background:rgba(49,50,68,.4); border-bottom:1px solid var(--s0); font-size:12px}
+  .twin{padding:8px 15px; color:var(--ov2); border-right:1px solid var(--s0)}
+  .twin.on{color:var(--crust); background:var(--green); font-weight:700}
+  .twin.agent{color:var(--peach)}
+  .tmuxbody{padding:15px 15px 24px; font-size:12.5px; color:var(--sub0); line-height:1.8}
+  .tmuxbody .prompt{color:var(--green)} .tmuxbody .br{color:var(--peach)}
+  .blink2{display:inline-block; width:.5ch; height:1em; background:var(--sub1); margin-left:3px; transform:translateY(.14em); animation:blink 1.05s steps(1) infinite}
+  .leg{margin-top:14px; text-align:center; font-size:12px; color:var(--ov2)}
+  .leg .k{color:var(--lav); background:var(--s0); border:1px solid var(--s1); padding:1px 7px; border-radius:5px}
+  .levelnotes{display:flex; flex-direction:column; gap:20px}
+  .lvl{display:flex; gap:15px; align-items:flex-start}
+  .lvl .num{flex:none; width:30px; height:30px; display:grid; place-items:center; border-radius:9px; font-family:var(--display); font-weight:700; font-size:13px; color:var(--crust); background:var(--c); box-shadow:0 8px 20px -8px var(--c)}
+  .lvl b{color:var(--text); font-weight:700} .lvl em{color:var(--ov2); font-style:normal; font-size:13.5px}
+  .levelnotes .muted{font-size:13px}
+
   /* footer status bar */
   footer{margin-top:40px; border-top:1px solid var(--s0); background:rgba(17,17,27,.6)}
   .fbar{max-width:var(--maxw); margin:0 auto; padding:14px 22px; display:flex; flex-wrap:wrap; align-items:center; gap:10px 18px; font-size:12.5px; color:var(--ov2)}
@@ -182,7 +206,7 @@
   @keyframes rise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
 
   @media(max-width:760px){
-    .shots,.grid,.cheat,.flow{grid-template-columns:1fr}
+    .shots,.grid,.cheat,.flow,.levels{grid-template-columns:1fr}
     .term .body{flex-direction:column}
     .statusbar .hideSm{display:none}
     .hero{padding:64px 0 24px}
@@ -254,6 +278,37 @@
         <img src="assets/btop.png" alt="btop system monitor" loading="lazy" />
         <figcaption class="cap"><b>btop</b> — animated system monitor · <kbd>top</kbd></figcaption>
       </figure>
+    </div>
+  </section>
+
+  <!-- TWO-LEVEL -->
+  <section class="block reveal">
+    <div class="label">two levels of parallel <span class="line"></span></div>
+    <h2>Run every project at once.</h2>
+    <p class="lede">Two independent tab layers, one nested in the other — so a stack of repos and their agents all stay live at the same time.</p>
+    <div class="levels">
+      <div class="leveldiagram">
+        <div class="gtabbar">
+          <span class="gtab on">⌘1 · api</span>
+          <span class="gtab">⌘2 · web</span>
+          <span class="gtab">⌘3 · infra</span>
+          <span class="gtab new">＋</span>
+        </div>
+        <div class="tmuxwin">
+          <div class="tmuxbar">
+            <span class="twin on">1 editor</span>
+            <span class="twin agent">2 ✶ claude</span>
+            <span class="twin">3 server</span>
+          </div>
+          <div class="tmuxbody"><span class="prompt">❯</span> ~/api · <span class="br">main</span> · nvim + Claude Code<span class="blink2"></span></div>
+        </div>
+        <div class="leg"><span class="k">⌘</span>+n → projects&nbsp;&nbsp;·&nbsp;&nbsp;<span class="k">⌃a</span>+n → tasks</div>
+      </div>
+      <div class="levelnotes">
+        <div class="lvl"><span class="num" style="--c:var(--mauve)">1</span><div><b>Ghostty tabs = projects.</b> <em><kbd>⌘T</kbd> new · <kbd>⌘1</kbd>–<kbd>⌘8</kbd> jump · <kbd>⌘⇧[ ]</kbd> cycle. One native macOS tab per repo.</em></div></div>
+        <div class="lvl"><span class="num" style="--c:var(--blue)">2</span><div><b>tmux = the cockpit inside.</b> <em>Windows for editor + agents, plus panes and splits. <kbd>C-a 1/2</kbd> windows · <kbd>C-a T</kbd> session switcher · <kbd>wt</kbd> an isolated worktree agent.</em></div></div>
+        <p class="muted">⌘+number flips projects, Ctrl-a+number flips tasks within one — both always live.</p>
+      </div>
     </div>
   </section>
 

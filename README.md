@@ -38,6 +38,30 @@ chsh -s "$(command -v fish)"   # make fish your login shell
 `install.sh` is idempotent and backs up any conflicting files to
 `~/.dotfiles-backup-<timestamp>/` before symlinking.
 
+## Run several projects at once
+
+The move I reach for most when juggling repos: **two independent tab layers**, one
+nested in the other — so a dozen projects and their agents all stay live.
+
+- **Outer — Ghostty tabs = projects.** `⌘T` new tab · `⌘1`…`⌘8` jump · `⌘9` last ·
+  `⌘⇧[` / `⌘⇧]` cycle. One macOS-native tab per repo/client.
+- **Inner — tmux = that project's cockpit.** Each tab holds a tmux session of
+  windows (editor, Claude agents) and panes. `Ctrl-a 1/2` jump windows,
+  `Ctrl-a T` fuzzy-switch sessions (sesh), `wt <branch>` spins an isolated agent.
+
+```text
+ ⌘1 api          ⌘2 web          ⌘3 infra        ← Ghostty tabs = projects
+ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+ │ tmux · C-a  │ │ tmux · C-a  │ │ tmux · C-a  │  ← a cockpit inside each tab
+ │  1 editor   │ │  1 editor   │ │  1 editor   │
+ │  2 claude   │ │  2 claude   │ │  2 server   │  ← windows · agents · C-a 1/2
+ └─────────────┘ └─────────────┘ └─────────────┘
+        ⌘ + number → projects   ·   Ctrl-a + number → tasks
+```
+
+`⌘1` (api: editor + agent) and `⌘2` (web) keep running side by side — `⌘`+number
+flips projects, `Ctrl-a`+number flips tasks within one.
+
 ## The agentic workflow
 
 **Parallel agents — `wt`** (the core idea):
@@ -78,6 +102,8 @@ Manage individual packages with `stow -t ~ <package>` / `stow -D -t ~ <package>`
 
 | Where | Key | Action |
 |---|---|---|
+| ghostty | `⌘T` · `⌘1`–`⌘8` | new tab / jump to a tab (one per project) |
+| ghostty | `⌘⇧[` / `⌘⇧]` | previous / next tab |
 | tmux | `Ctrl-a` | prefix |
 | tmux | `prefix \|` / `prefix -` | split right / down |
 | tmux | `prefix T` | session switcher (sesh + fzf) |
@@ -98,6 +124,7 @@ Manage individual packages with `stow -t ~ <package>` / `stow -D -t ~ <package>`
 New here? These cover most day-to-day moves.
 
 **Move around** — one set of keys for the whole grid:
+- **Projects = Ghostty tabs:** `⌘T` new, `⌘1`/`⌘2`… jump. One tab per project; tmux is the cockpit inside each.
 - `Ctrl-h/j/k/l` flows seamlessly between Neovim splits and tmux panes — no prefix.
 - tmux windows: `prefix 1`/`2`… jump by number, `prefix n`/`p` next/prev, `prefix l` last.
 - Neovim buffers (the tabs up top): `Shift-h` / `Shift-l` to cycle, `<leader>,` to fuzzy-pick.
