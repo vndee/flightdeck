@@ -1,0 +1,34 @@
+# ~/.config/ghostty/config
+
+# --- Appearance ---
+theme = catppuccin-mocha
+font-family = "JetBrainsMono Nerd Font"
+font-size = 14
+font-thicken = true
+background-opacity = 0.96
+background-blur-radius = 20
+window-padding-x = 10
+window-padding-y = 8
+window-padding-balance = true
+cursor-style = block
+cursor-style-blink = false
+mouse-hide-while-typing = true
+unfocused-split-opacity = 0.85
+
+# --- macOS ---
+macos-option-as-alt = true
+macos-titlebar-style = tabs
+window-save-state = always
+
+# --- Shell / behaviour ---
+shell-integration = fish
+shell-integration-features = cursor,sudo,title
+confirm-close-surface = false
+copy-on-select = clipboard
+
+# --- Keybinds (Ghostty splits; tmux handles the rest) ---
+keybind = cmd+d=new_split:right
+keybind = cmd+shift+d=new_split:down
+keybind = cmd+w=close_surface
+keybind = cmd+enter=toggle_fullscreen
+keybind = cmd+k=clear_screen
