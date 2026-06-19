@@ -99,6 +99,7 @@ New here? These cover most day-to-day moves.
 - `z <partial>` — [zoxide](https://github.com/ajeetdsouza/zoxide) jumps to a frecent dir (e.g. `z flight`); `zi` to pick interactively.
 - `Ctrl-r` — [atuin](https://atuin.sh) fuzzy history search (↑ still scrolls plain fish history).
 - `Ctrl-t` insert a file path · `Alt-c` cd into a directory — both [fzf](https://github.com/junegunn/fzf), sourced from [fd](https://github.com/sharkdp/fd).
+- `prefix T` (capital **T**) — [sesh](https://github.com/joshmedeski/sesh) switcher: a fuzzy popup over your tmux sessions **and** zoxide dirs; `Enter` to jump to one or spin a new one up.
 
 **Files:**
 - `<leader>e` toggles the Neo-tree sidebar; press `?` inside it for every key.
@@ -115,7 +116,7 @@ New here? These cover most day-to-day moves.
 **Git & agents:**
 - `lg` or `prefix g` → [**lazygit**](https://github.com/jesseduffield/lazygit) TUI · `gh …` → GitHub (PRs, issues) from the terminal.
 - `<leader>ac` opens Claude Code inside Neovim; leave its pane with `Ctrl-\ Ctrl-n` then `Ctrl-h`.
-- `prefix a` spawns a Claude pane; `wt <branch>` spins up a full parallel agent on its own worktree; `prefix T` flips between sessions ([sesh](https://github.com/joshmedeski/sesh)).
+- `prefix a` spawns a Claude pane; `wt <branch>` spins up a full parallel agent on its own worktree.
 
 **Discover anything:** press `<leader>` (Space) and pause — which-key pops up with every shortcut.
 
