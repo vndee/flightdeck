@@ -10,6 +10,10 @@ opt.confirm = true
 opt.splitkeep = "screen"
 opt.timeoutlen = 400
 
+-- Steady block cursor in every mode (matches Ghostty: cursor-style = block, blink = false).
+-- Default Neovim uses a beam in insert mode; blinkon0 disables blinking.
+opt.guicursor = "n-v-c-i-ci-ve-r-cr-o-sm:block-blinkon0"
+
 -- Use ripgrep for :grep
 if vim.fn.executable("rg") == 1 then
   opt.grepprg = "rg --vimgrep --smart-case --hidden"
