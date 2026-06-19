@@ -1,0 +1,30 @@
+# Planning / design notes (local only)
+docs/plans/
+
+# Machine-local secrets
+fish/.config/fish/conf.d/secret.fish
+git/.config/git/local.config
+
+# fish: track only hand-written files; ignore fisher-installed plugins,
+# generated themes, and machine-local universal variables.
+fish/.config/fish/completions/
+fish/.config/fish/functions/*
+!fish/.config/fish/functions/y.fish
+fish/.config/fish/conf.d/*
+!fish/.config/fish/conf.d/abbr.fish
+!fish/.config/fish/conf.d/theme.fish
+!fish/.config/fish/conf.d/secret.fish.example
+fish/.config/fish/themes/
+fish/.config/fish/fish_variables
+
+# tmux: tpm clones plugins here
+tmux/.config/tmux/plugins/
+
+# yazi: ya installs flavors/plugins here
+yazi/.config/yazi/flavors/
+yazi/.config/yazi/plugins/
+yazi/.config/yazi/package.toml
+
+# OS / editor noise
+.DS_Store
+*.swp
