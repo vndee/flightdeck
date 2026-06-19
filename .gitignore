@@ -1,6 +1,8 @@
 # Planning / design notes (local only)
 docs/plans/
 
+.playwright-mcp
+
 # Machine-local secrets
 fish/.config/fish/conf.d/secret.fish
 git/.config/git/local.config
