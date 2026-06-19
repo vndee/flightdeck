@@ -8,7 +8,8 @@ abbr -a vi nvim
 abbr -a ls 'eza --icons --group-directories-first'
 abbr -a ll 'eza -l --icons --group-directories-first --git'
 abbr -a la 'eza -la --icons --group-directories-first --git'
-abbr -a lt 'eza --tree --level=2 --icons'
+abbr -a lr 'eza -l --icons --group-directories-first --git --sort=modified'  # recent (newest last), like `ls -ltr`
+abbr -a lt 'eza --tree --level=2 --icons'                                    # tree view
 abbr -a cat bat
 
 # Git
