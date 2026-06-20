@@ -25,6 +25,7 @@ brew "atuin"         # shell history
 brew "btop"          # process monitor
 brew "gh"            # GitHub CLI
 brew "jq"            # JSON
+brew "glow"          # markdown renderer (terminal)
 brew "tlrc"          # tldr (rust client)
 brew "sesh"          # tmux session manager
 

@@ -23,7 +23,7 @@ agents in parallel on isolated git worktrees, or drive one from inside Neovim.
 | Multiplexer | [tmux](https://github.com/tmux/tmux) + [sesh](https://github.com/joshmedeski/sesh) + tpm plugins |
 | Editor | [Neovim](https://neovim.io) + [LazyVim](https://lazyvim.org) |
 | Agent | [Claude Code](https://claude.com/claude-code) + `wt` worktrees + [claudecode.nvim](https://github.com/coder/claudecode.nvim) |
-| CLI core | fzf · fd · ripgrep · bat · eza · zoxide · git-delta · lazygit · yazi · atuin · btop · gh |
+| CLI core | fzf · fd · ripgrep · bat · eza · zoxide · git-delta · lazygit · yazi · atuin · btop · glow · gh |
 | Theme | Catppuccin Mocha (everywhere) |
 
 ## Install
@@ -146,6 +146,7 @@ New here? These cover most day-to-day moves.
 - `cat <file>` → [**bat**](https://github.com/sharkdp/bat) (syntax highlight + git gutter) · `top` → [**btop**](https://github.com/aristocratos/btop) (animated system monitor).
 - `ls` (icons) · `ll` (long+git) · `la` (+hidden) · `lr` (recent, newest last) · `lt` (tree) → [**eza**](https://github.com/eza-community/eza).
 - `git diff` / `gd` → [**delta**](https://github.com/dandavison/delta) side-by-side, syntax-highlighted diffs (also inside lazygit).
+- **Markdown:** `glow file.md` renders it in the terminal (`glow -p` to page). In Neovim, `.md` renders **inline as you read** ([render-markdown.nvim](https://github.com/MeanderingProgrammer/render-markdown.nvim) — `:RenderMarkdown toggle` for raw) and `<leader>cp` opens a live **browser preview**.
 
 **Git & agents:**
 - `lg` or `prefix g` → [**lazygit**](https://github.com/jesseduffield/lazygit) TUI · `gh …` → GitHub (PRs, issues) from the terminal.
