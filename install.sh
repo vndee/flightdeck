@@ -4,6 +4,7 @@
 set -euo pipefail
 
 DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DOTFILES_PHYS="$(cd "$DOTFILES" && pwd -P)"  # symlink-resolved, for stow-aware backup
 BACKUP="$HOME/.dotfiles-backup-$(date +%Y%m%d-%H%M%S)"
 PACKAGES=(fish starship tmux ghostty nvim git bat lazygit atuin yazi bin)
 
@@ -29,6 +30,16 @@ mkdir -p "$BACKUP"
 for pkg in "${PACKAGES[@]}"; do
   while IFS= read -r rel; do
     target="$HOME/$rel"
+    # Skip anything already stowed. A previous run may have folded a whole
+    # directory into a symlink (e.g. ~/.config/ghostty -> $DOTFILES/...), so the
+    # final path component looks like a real file even though it lives in the
+    # repo. Resolving the parent's physical path catches that case; backing such
+    # a file up would move the repo's own files out and break the package.
+    parent="$(dirname "$target")"
+    if [ -d "$parent" ]; then
+      phys="$(cd "$parent" && pwd -P)/$(basename "$target")"
+      case "$phys" in "$DOTFILES_PHYS"/*) continue ;; esac
+    fi
     if [ -e "$target" ] && [ ! -L "$target" ]; then
       mkdir -p "$BACKUP/$(dirname "$rel")"
       mv "$target" "$BACKUP/$rel"
