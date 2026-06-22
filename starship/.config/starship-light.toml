@@ -21,7 +21,7 @@ $character"""
 
 # Dark default. config.fish points STARSHIP_CONFIG at starship-light.toml (same
 # file, palette = 'catppuccin_latte') when macOS is in light mode.
-palette = 'catppuccin_mocha'
+palette = 'catppuccin_latte'
 add_newline = true
 
 [palettes.catppuccin_latte]

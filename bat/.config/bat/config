@@ -1,4 +1,6 @@
---theme="Catppuccin Mocha"
+# Auto-detect terminal/system appearance (OSC 11) and pick the matching theme.
+--theme-dark="Catppuccin Mocha"
+--theme-light="Catppuccin Latte"
 --style="numbers,changes,header"
 --italic-text=always
 --paging=auto

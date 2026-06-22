@@ -1,7 +1,8 @@
 # ~/.config/ghostty/config
 
 # --- Appearance ---
-theme = Catppuccin Mocha
+# Auto-switches with macOS appearance: Latte when light, Mocha when dark.
+theme = light:Catppuccin Latte,dark:Catppuccin Mocha
 font-family = "JetBrainsMono Nerd Font"
 font-size = 14
 font-thicken = true
