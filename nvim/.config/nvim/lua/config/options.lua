@@ -19,3 +19,12 @@ if vim.fn.executable("rg") == 1 then
   opt.grepprg = "rg --vimgrep --smart-case --hidden"
   opt.grepformat = "%f:%l:%c:%m"
 end
+
+-- Follow the system appearance. fish exports FLIGHTDECK_THEME (light/dark); honour
+-- it so catppuccin's "auto" flavour is correct even inside tmux, where Neovim's
+-- own OSC 11 background detection is unreliable. Without the var (nvim launched
+-- outside fish), Neovim's OSC 11 detection still drives the background.
+local appearance = vim.env.FLIGHTDECK_THEME
+if appearance == "light" or appearance == "dark" then
+  opt.background = appearance
+end

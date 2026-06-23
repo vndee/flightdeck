@@ -1,8 +1,11 @@
 # ~/.config/ghostty/config
 
 # --- Appearance ---
-theme = Catppuccin Mocha
-font-family = "JetBrainsMono Nerd Font"
+# Auto-switches with macOS appearance: Latte when light, Mocha when dark.
+theme = light:Catppuccin Latte,dark:Catppuccin Mocha
+# Full family name as registered by the cask (the short "JetBrainsMono Nerd Font"
+# does not exist → Ghostty falls back to a font without glyphs → icons show as ?).
+font-family = "JetBrainsMono Nerd Font Mono"
 font-size = 14
 font-thicken = true
 background-opacity = 0.96
